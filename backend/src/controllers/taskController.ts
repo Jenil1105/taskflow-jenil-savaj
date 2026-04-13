@@ -1,185 +1,149 @@
 import { createTaskService, getTasksService, updateTaskService, deleteTaskService } from "../services/taskService"
 import { Response } from "express"
 import { successResponse, errorResponse } from "../utils/response"
+import { asyncHandler } from "../utils/asycHandler"
 
 
 // CREATE task (owner + member of that project)
 //_________________________________________________________________________________________________________________________
 
-export const createTask = async (req: any, res: Response) => {
-    try {
-        const projectId = req.params.id
-        const userId = req.user.user_id
+export const createTask = asyncHandler(async (req: any, res: Response, next: any) => {
 
-        const { title, description, priority, assignee_id } = req.body
+    const projectId = req.params.id
+    const userId = req.user.user_id
 
-        if (!title?.trim()) {
-            return errorResponse(res, 400, "Validation failed", {
-                title: "required"
-            })
-        }
+    const { title, description, priority, assignee_id } = req.body
 
-        const task = await createTaskService({
-            title: title.trim(),
-            description,
-            priority,
-            assignee_id,
-            projectId,
-            userId
+    if (!title?.trim()) {
+        return errorResponse(res, 400, "Validation failed", {
+            title: "required"
         })
-
-        return successResponse(res, 201, "Task created successfully", task)
-
-    } catch (err: any) {
-        console.error(err)
-
-        // Handle custom service errors
-        if (err.status) {
-            return errorResponse(res, err.status, err.error)
-        }
-
-        return errorResponse(res, 500, "Internal server error")
     }
-}
+
+    const task = await createTaskService({
+        title: title.trim(),
+        description,
+        priority,
+        assignee_id,
+        projectId,
+        userId
+    })
+
+    return successResponse(res, 201, "Task created successfully", task)
+
+})
 
 
 // GET all tasks associated with project with filter
 //_________________________________________________________________________________________________________________________
 
-export const getTasks = async (req: any, res: Response) => {
-    try {
-        const projectId = req.params.id
-        const userId = req.user.user_id
+export const getTasks = asyncHandler(async (req: any, res: Response, next: any) => {
 
-        // Query params always come as strings
-        const status = req.query.status as string | undefined
-        const assignee = req.query.assignee
-            ? Number(req.query.assignee)
-            : undefined
+    const projectId = req.params.id
+    const userId = req.user.user_id
 
-        const tasks = await getTasksService({
-            projectId,
-            userId,
-            status,
-            assignee
-        })
+    // Query params always come as strings
+    const status = req.query.status as string | undefined
+    const assignee = req.query.assignee
+        ? Number(req.query.assignee)
+        : undefined
 
-        return successResponse(res, 200, "Tasks fetched successfully", tasks)
+    const tasks = await getTasksService({
+        projectId,
+        userId,
+        status,
+        assignee
+    })
 
-    } catch (err: any) {
-        console.error(err)
+    return successResponse(res, 200, "Tasks fetched successfully", tasks)
 
-        if (err.status) {
-            return errorResponse(res, err.status, err.error)
-        }
-
-        return errorResponse(res, 500, "Internal server error")
-    }
-}
+})
 
 
 // UPDATE task
 //_________________________________________________________________________________________________________________________
 
-export const updateTask = async (req: any, res: Response) => {
-    try {
-        const taskId = req.params.id
-        const userId = req.user.user_id
+export const updateTask = asyncHandler(async (req: any, res: Response, next: any) => {
 
-        let {
-            title,
-            description,
-            status,
-            priority,
-            assignee_id,
-            due_date
-        } = req.body
+    const taskId = req.params.id
+    const userId = req.user.user_id
 
-        // Normalize inputs
-        title = title?.trim()
-        assignee_id = assignee_id ? assignee_id : undefined
-        due_date = due_date ? new Date(due_date) : undefined
+    let {
+        title,
+        description,
+        status,
+        priority,
+        assignee_id,
+        due_date
+    } = req.body
 
-        if (due_date && isNaN(due_date.getTime())) {
-            return errorResponse(res, 400, "Invalid due date")
-        }
+    // Normalize inputs
+    title = title?.trim()
+    assignee_id = assignee_id ? assignee_id : undefined
+    due_date = due_date ? new Date(due_date) : undefined
 
-        // Nothing to update check
-        if (
-            !title &&
-            !description &&
-            !status &&
-            !priority &&
-            assignee_id === undefined &&
-            !due_date
-        ) {
-            return errorResponse(res, 400, "Validation failed", {
-                message: "Nothing to update"
-            })
-        }
-
-        // enum validation
-        const validStatus = ["todo", "in_progress", "done"]
-        if (status && !validStatus.includes(status)) {
-            return errorResponse(res, 400, "Invalid status")
-        }
-
-        const validPriority = ["low", "medium", "high"]
-        if (priority && !validPriority.includes(priority)) {
-            return errorResponse(res, 400, "Invalid priority")
-        }
-
-        const task = await updateTaskService({
-            taskId,
-            userId,
-            title,
-            description,
-            status,
-            priority,
-            assignee_id,
-            due_date
-        })
-
-        if (!task) {
-            return errorResponse(res, 404, "Task not found")
-        }
-
-        return successResponse(res, 200, "Task updated successfully", task)
-
-    } catch (err: any) {
-        console.error(err)
-
-        if (err.status) {
-            return errorResponse(res, err.status, err.error)
-        }
-
-        return errorResponse(res, 500, "Internal server error")
+    if (due_date && isNaN(due_date.getTime())) {
+        return errorResponse(res, 400, "Invalid due date")
     }
-}
+
+    // Nothing to update check
+    if (
+        !title &&
+        !description &&
+        !status &&
+        !priority &&
+        assignee_id === undefined &&
+        !due_date
+    ) {
+        return errorResponse(res, 400, "Validation failed", {
+            message: "Nothing to update"
+        })
+    }
+
+    // enum validation
+    const validStatus = ["todo", "in_progress", "done"]
+    if (status && !validStatus.includes(status)) {
+        return errorResponse(res, 400, "Invalid status")
+    }
+
+    const validPriority = ["low", "medium", "high"]
+    if (priority && !validPriority.includes(priority)) {
+        return errorResponse(res, 400, "Invalid priority")
+    }
+
+    const task = await updateTaskService({
+        taskId,
+        userId,
+        title,
+        description,
+        status,
+        priority,
+        assignee_id,
+        due_date
+    })
+
+    if (!task) {
+        return errorResponse(res, 404, "Task not found")
+    }
+
+    return successResponse(res, 200, "Task updated successfully", task)
+
+})
 
 // DELETE task
 //_________________________________________________________________________________________________________________________
 
-export const deleteTask = async (req: any, res: Response) => {
-    try {
-        const taskId = req.params.id
-        const userId = req.user.user_id
+export const deleteTask = asyncHandler(async (req: any, res: Response, next: any) => {
 
-        const deleted = await deleteTaskService(taskId, userId)
+    const taskId = req.params.id
+    const userId = req.user.user_id
 
-        if (!deleted) {
-            return errorResponse(res, 404, "Task not found")
-        }
+    const deleted = await deleteTaskService(taskId, userId)
 
-        return successResponse(res, 200, "Task deleted successfully")
-
-    } catch (err: any) {
-        console.error(err)
-
-        if (err.status) {
-            return errorResponse(res, err.status, err.error)
-        }
-
-        return errorResponse(res, 500, "Internal server error")
+    if (!deleted) {
+        return errorResponse(res, 404, "Task not found")
     }
-}
+
+    return successResponse(res, 200, "Task deleted successfully")
+
+})

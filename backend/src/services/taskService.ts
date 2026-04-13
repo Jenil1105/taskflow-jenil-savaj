@@ -1,6 +1,10 @@
 import { pool } from "../db"
 import { v4 as uuidv4 } from "uuid"
 
+
+// CREATE task (owner + member of that project)
+//_________________________________________________________________________________________________________________________
+
 export const createTaskService = async ({
     title,
     description,
@@ -56,6 +60,10 @@ export const createTaskService = async ({
 
     return result.rows[0]
 }
+
+
+// GET all tasks associated with project with filter
+//_________________________________________________________________________________________________________________________
 
 export const getTasksService = async ({
     projectId,
@@ -116,6 +124,9 @@ export const getTasksService = async ({
     return result.rows
 }
 
+
+// UPDATE task
+//_________________________________________________________________________________________________________________________
 
 export const updateTaskService = async ({
     taskId,
@@ -182,6 +193,9 @@ export const updateTaskService = async ({
     return result.rows[0]
 }
 
+
+// DELETE task
+//_________________________________________________________________________________________________________________________
 
 export const deleteTaskService = async (taskId: string, userId: string) => {
 

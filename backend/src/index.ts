@@ -5,6 +5,7 @@ import { pool } from "./db"
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./utils/swagger";
 import routes from "./routes/index"
+import { errorMiddleware } from "./middlewares/errorMiddleware";
 
 dotenv.config()
 
@@ -20,6 +21,7 @@ app.get("/health", (req, res) => {
 })
 
 app.use("/api", routes);
+app.use(errorMiddleware)
 
 const PORT = process.env.PORT || 3000
 
