@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "migrate": "node-pg-migrate",
-    "dev": "ts-node-dev --respawn src/index.ts"
+    "dev": "ts-node-dev --respawn src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "author": "Jenil Savaj",
   "license": "ISC",

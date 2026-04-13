@@ -1,16 +1,26 @@
+version: "3.8"
+
 services:
   postgres:
     image: postgres:15
     container_name: taskflow_postgres
     restart: always
     environment:
+      POSTGRES_DB: taskflow
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: taskflow
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
-volumes:
-  postgres_data:
+  backend:
+    build: ./backend
+    container_name: taskflow_backend
+    restart: on-failure
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/taskflow
+      JWT_SECRET: supersecret
+    command: sh -c "npx node-pg-migrate up && npm start"
