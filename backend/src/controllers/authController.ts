@@ -1,53 +1,47 @@
 import { Request, Response } from "express"
 import { registerUser, loginUser } from "../services/authService"
 import { asyncHandler } from "../utils/asycHandler"
+import { successResponse, errorResponse } from "../utils/response"
 
 
 // REGISTER Controller
 
-export const register = asyncHandler(async (req: Request, res: Response, next: any) => {
-
+export const register = asyncHandler(async (req: Request, res: Response) => {
     const { name, email, password } = req.body
 
     // validation
     if (!name || !email || !password) {
-        return res.status(400).json({
-            error: "validation failed",
-            fields: {
-                name: !name ? "required" : undefined,
-                email: !email ? "required" : undefined,
-                password: !password ? "required" : undefined
-            }
+        return errorResponse(res, 400, "Validation failed", {
+            name: !name ? "required" : undefined,
+            email: !email ? "required" : undefined,
+            password: !password ? "required" : undefined
         })
     }
 
-    // call register service
     const user = await registerUser(name, email, password)
 
-    return res.status(201).json(user)
-
+    return successResponse(res, 201, "User registered successfully", user)
 })
 
 
 // LOGIN Controller
 
-export const login = asyncHandler(async (req: any, res: any, next: any) => {
-
+export const login = asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = req.body
 
     // validation
     if (!email || !password) {
-        return res.status(400).json({
-            error: "validation failed",
+        throw {
+            status: 400,
+            error: "Validation failed",
             fields: {
                 email: !email ? "required" : undefined,
                 password: !password ? "required" : undefined
             }
-        })
+        }
     }
 
-    // call login service
     const user = await loginUser(email, password)
 
-    return res.json(user)
+    return successResponse(res, 200, "Login successful", user)
 })
