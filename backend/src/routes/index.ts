@@ -1,9 +1,11 @@
 import { Router } from "express"
-import authRoutes from "./authRoutes"
+import authRouter from "./authRoutes"
+import projectRouter from "./projectRoutes"
 import { authMiddleware } from "../middlewares/authMiddleware"
 
 const router = Router()
 
-router.use("/auth", authRoutes)
+router.use("/auth", authRouter)
+router.use("/projects", authMiddleware, projectRouter)
 
 export default router
