@@ -44,18 +44,20 @@ export const getTasks = asyncHandler(async (req: any, res: Response, next: any) 
 
     // Query params always come as strings
     const status = req.query.status as string | undefined
-    const assignee = req.query.assignee
-        ? Number(req.query.assignee)
-        : undefined
+    const assignee = req.query.assignee as string | undefined
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
 
-    const tasks = await getTasksService({
+    const response = await getTasksService({
         projectId,
         userId,
         status,
-        assignee
+        assignee,
+        page,
+        limit
     })
 
-    return successResponse(res, 200, "Tasks fetched successfully", tasks)
+    return successResponse(res, 200, "Tasks fetched successfully", response)
 
 })
 

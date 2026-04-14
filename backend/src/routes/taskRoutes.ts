@@ -17,7 +17,7 @@ const router = Router({ mergeParams: true })
  *         required: true
  *         schema:
  *           type: string
- *         example: c3d4e5f6-3333-4c3d-ae3f-cccccccccccc
+ *         example: a1b2c3d4-1111-4a1b-8c1d-aaaaaaaaaaaa
  *     requestBody:
  *       required: true
  *       content:
@@ -39,12 +39,18 @@ const router = Router({ mergeParams: true })
  *                 example: high
  *               assignee_id:
  *                 type: string
- *                 example: 9a2b8d63-2b5e-4c6c-8d9f-2b3c4d5e6f02
+ *                 example: 8f1a7c52-1a4d-4f5b-9c8e-1a2b3c4d5e01
  *     responses:
  *       201:
  *         description: Task created successfully
  *       400:
  *         description: Validation failed
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: Project not found
  *
  *   get:
  *     summary: Get all tasks for a project
@@ -57,7 +63,7 @@ const router = Router({ mergeParams: true })
  *         required: true
  *         schema:
  *           type: string
- *         example: c3d4e5f6-3333-4c3d-ae3f-cccccccccccc
+ *         example: a1b2c3d4-1111-4a1b-8c1d-aaaaaaaaaaaa
  *       - in: query
  *         name: status
  *         schema:
@@ -66,10 +72,16 @@ const router = Router({ mergeParams: true })
  *       - in: query
  *         name: assignee
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *         description: Tasks fetched successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: Project not found
  *
  * /api/tasks/{id}:
  *   patch:
@@ -83,7 +95,7 @@ const router = Router({ mergeParams: true })
  *         required: true
  *         schema:
  *           type: string
- *         example: 88888888-2222-4222-8222-222222222228
+ *         example: 11111111-aaaa-4aaa-8aaa-aaaaaaaaaaa1
  *     requestBody:
  *       required: true
  *       content:
@@ -107,7 +119,7 @@ const router = Router({ mergeParams: true })
  *                 example: medium
  *               assignee_id:
  *                 type: string
- *                 example: 9a2b8d63-2b5e-4c6c-8d9f-2b3c4d5e6f02
+ *                 example: 8f1a7c52-1a4d-4f5b-9c8e-1a2b3c4d5e01
  *               due_date:
  *                 type: string
  *                 format: date-time
@@ -116,6 +128,10 @@ const router = Router({ mergeParams: true })
  *         description: Task updated successfully
  *       400:
  *         description: Validation failed
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
  *       404:
  *         description: Task not found
  *
@@ -130,10 +146,14 @@ const router = Router({ mergeParams: true })
  *         required: true
  *         schema:
  *           type: string
- *         example: 88888888-2222-4222-8222-222222222228
+ *         example: 11111111-aaaa-4aaa-8aaa-aaaaaaaaaaa1
  *     responses:
  *       200:
  *         description: Task deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
  *       404:
  *         description: Task not found
  */

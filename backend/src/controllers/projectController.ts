@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { createProjectService, getProjectsService, getProjectByIdService, updateProjectService, deleteProjectService } from "../services/projectService"
+import { createProjectService, getProjectsService, getProjectByIdService, updateProjectService, deleteProjectService, getProjectStatsService } from "../services/projectService"
 import { successResponse, errorResponse } from "../utils/response"
 import { asyncHandler } from "../utils/asycHandler"
 
@@ -31,9 +31,12 @@ export const createProject = asyncHandler(async (req: any, res: Response, next: 
 export const getProjects = asyncHandler(async (req: any, res: Response, next: any) => {
 
     const userId = req.user.user_id
-    const projects = await getProjectsService(userId)
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
 
-    return successResponse(res, 200, "Projects fetched successfully", projects)
+    const response = await getProjectsService(userId, page, limit)
+
+    return successResponse(res, 200, "Projects fetched successfully", response)
 
 })
 
@@ -101,4 +104,21 @@ export const deleteProject = asyncHandler(async (req: any, res: Response, next: 
 
     return successResponse(res, 200, "Project deleted successfully")
 
+})
+
+// GET project stats
+//_________________________________________________________________________________________________________________________
+
+export const getProjectStats = asyncHandler(async (req: any, res: Response, next: any) => {
+
+    const projectId = req.params.id
+    const userId = req.user.user_id
+
+    const stats = await getProjectStatsService(projectId, userId);
+
+    if (!stats) {
+        return errorResponse(res, 404, "Project not found")
+    }
+
+    return successResponse(res, 200, "Project stats fetched successfully", stats)
 })

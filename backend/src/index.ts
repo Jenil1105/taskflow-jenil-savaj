@@ -24,6 +24,11 @@ app.get("/health", (req, res) => {
 })
 
 app.use("/api", routes);
+
+app.use((req, res, next) => {
+  res.status(404).json({ error: "not found" });
+});
+
 app.use(errorMiddleware)
 
 const PORT = process.env.PORT || 3000
@@ -32,6 +37,33 @@ pool.connect()
   .then(() => logger.info("DB connected"))
   .catch((err: unknown) => logger.error("DB error", { error: err instanceof Error ? err.message : String(err) }))
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`)
 })
+
+// Graceful shutdown
+const gracefulShutdown = () => {
+  logger.info("Shutdown signal received: closing HTTP server");
+
+  server.close(() => {
+    logger.info("HTTP server closed.");
+
+    // Close Database pool
+    pool.end().then(() => {
+      logger.info("PostgreSQL pool closed.");
+      process.exit(0);
+    }).catch((err) => {
+      logger.error("Error during PostgreSQL pool closure", { error: err instanceof Error ? err.message : String(err) });
+      process.exit(1);
+    });
+  });
+
+  // Force shutdown if it takes too long (e.g. 10 secs)
+  setTimeout(() => {
+    logger.error("Could not close connections in time, forcefully shutting down");
+    process.exit(1);
+  }, 10000);
+}
+
+process.on("SIGTERM", gracefulShutdown);
+process.on("SIGINT", gracefulShutdown);
