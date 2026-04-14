@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express"
 import { pool } from "../db"
+import { logger } from "../utils/logger"
 
 export const checkProjectOwner = async (req: any, res: Response, next: NextFunction) => {
     try {
@@ -21,8 +22,8 @@ export const checkProjectOwner = async (req: any, res: Response, next: NextFunct
 
         next()
 
-    } catch (err) {
-        console.error(err)
+    } catch (err: any) {
+        logger.error("Error checking project owner", { error: err.message, stack: err.stack });
         return res.status(500).json({ error: "internal server error" })
     }
 }

@@ -6,7 +6,7 @@ import { successResponse, errorResponse } from "../utils/response"
 
 // REGISTER Controller
 
-export const register = asyncHandler(async (req: Request, res: Response) => {
+export const register = asyncHandler(async (req: Request, res: Response, next: any) => {
     const { name, email, password } = req.body
 
     // validation
@@ -26,7 +26,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
 // LOGIN Controller
 
-export const login = asyncHandler(async (req: Request, res: Response) => {
+export const login = asyncHandler(async (req: Request, res: Response, next: any) => {
     const { email, password } = req.body
 
     // validation

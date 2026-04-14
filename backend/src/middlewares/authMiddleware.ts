@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from "express"
 import jwt from "jsonwebtoken"
+import { logger } from "../utils/logger"
 
 const JWT_SECRET = process.env.JWT_SECRET as string
 
 export const authMiddleware = (req: any, res: Response, next: NextFunction) => {
     try {
         const authHeader = req.headers.authorization
-
+        logger.debug("Auth header received", { authHeader: authHeader ? "present" : "missing" });
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return res.status(401).json({ error: "unauthorized" })
         }

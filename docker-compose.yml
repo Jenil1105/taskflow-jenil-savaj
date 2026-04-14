@@ -1,14 +1,12 @@
-version: "3.8"
-
 services:
   postgres:
     image: postgres:15
     container_name: taskflow_postgres
     restart: always
     environment:
-      POSTGRES_DB: taskflow
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
 
@@ -20,7 +18,12 @@ services:
       - postgres
     ports:
       - "3000:3000"
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/taskflow
-      JWT_SECRET: supersecret
-    command: sh -c "npx node-pg-migrate up && npm start"
+    env_file:
+      - .env
+    volumes:
+      - ./backend/seeds:/seeds   
+    command: >
+      sh -c "npx node-pg-migrate up &&
+      sleep 3 &&
+      psql $DATABASE_URL -f /seeds/seed.sql &&
+      npm start"

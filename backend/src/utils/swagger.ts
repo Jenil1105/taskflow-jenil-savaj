@@ -13,8 +13,20 @@ const options = {
                 url: "http://localhost:3000",
             },
         ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: "http",
+                    scheme: "bearer",
+                    bearerFormat: "JWT"
+                }
+            }
+        }
     },
-    apis: ["./src/routes/*.ts"], // where annotations will be
+    apis: [
+        "./src/routes/*.ts",
+        "./dist/routes/*.js"
+    ], // where annotations will be
 };
 
 export const swaggerSpec = swaggerJSDoc(options);

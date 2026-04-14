@@ -1,3 +1,4 @@
+# ---- Build stage ----
 FROM node:22-alpine AS builder
 
 WORKDIR /app
@@ -20,6 +21,8 @@ RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
 COPY migrations ./migrations
+
+RUN apk add --no-cache postgresql-client
 
 ENV NODE_ENV=production
 
