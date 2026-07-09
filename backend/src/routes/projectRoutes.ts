@@ -157,8 +157,8 @@ router.post("/", createProject)
 router.get("/", getProjects)
 router.get("/:id/stats", getProjectStats)
 router.get("/:id", getProjectById)
-// router.patch("/:id", checkProjectOwner, updateProject)
-// router.delete("/:id", checkProjectOwner, deleteProject)
-// router.use("/:id/tasks", taskRoutes)
+router.patch("/:id", checkProjectOwner, updateProject)
+router.delete("/:id", checkProjectOwner, deleteProject)
+router.use("/:id/tasks", taskRoutes)
 
 export default router
