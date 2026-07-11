@@ -6,21 +6,18 @@
 - [2. Architecture Decisions](#2-architecture-decisions)
 - [3. Running Locally](#3-running-locally)
 - [4. Running Migrations](#4-running-migrations)
-- [5. Test Credentials](#5-test-credentials)
 - [6. API Reference](#6-api-reference)
 - [7. What I'd Do With More Time](#7-what-id-do-with-more-time)
 
 ## 1. Overview
 
-TaskFlow is a task management backend that supports user authentication, project management, task CRUD, filtering, pagination, seeded demo data, and interactive API documentation.
+TaskFlow is a task management backend that supports project management, task CRUD, filtering, pagination, seeded demo data, and interactive API documentation.
 
 This submission is implemented as a Node.js + TypeScript REST API using:
 
 - Express for HTTP routing
 - PostgreSQL for persistence
 - `node-pg-migrate` for schema migrations
-- JWT for authentication
-- bcrypt for password hashing
 - Winston + Morgan for structured request/application logging
 - Swagger UI for direct API testing
 - Docker Compose for local setup
@@ -46,17 +43,6 @@ Logging is included so local debugging and API review are easier.
 - HTTP requests are captured through Morgan
 - Application logs are written through Winston
 - This gives consistent request-level visibility and keeps operational logging separate from route/controller logic
-
-### Authentication and Authorization
-
-Authentication and authorization are separated intentionally.
-
-- Authentication is handled with JWT. After login, the backend returns a token that must be sent on protected routes using `Authorization: Bearer <token>`.
-- The `authMiddleware` validates the token, rejects unauthenticated requests, and attaches the authenticated user to the request.
-- Authorization is enforced after authentication. Project update and delete routes check ownership so only the project owner can modify or delete that project.
-- Task access is also scoped to the authenticated user. Task listing, creation, update, and delete flows are validated against the user's access to the related project or task.
-
-That split keeps identity verification separate from business permissions, which makes the system easier to reason about and easier to extend later if membership rules become more advanced.
 
 ### Tradeoffs
 
@@ -151,24 +137,6 @@ cp .env.example .env
 docker compose up --build
 ```
 
-## 5. Test Credentials
-
-The seed script creates test users immediately, so you can log in without registering first.
-
-Primary test user:
-
-```text
-Email:    jenil@example.com
-Password: password123
-```
-
-Secondary test user:
-
-```text
-Email:    user@example.com
-Password: password123
-```
-
 ## 6. API Reference
 
 Interactive API docs:
@@ -176,11 +144,6 @@ Interactive API docs:
 - Swagger UI: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
 
 Core endpoints:
-
-### Auth
-
-- `POST /api/auth/register`
-- `POST /api/auth/login`
 
 ### Projects
 
@@ -203,11 +166,7 @@ Core endpoints:
 Use Swagger if you want to test APIs directly from the browser:
 
 1. Open [http://localhost:3000/api-docs](http://localhost:3000/api-docs).
-2. Run `POST /api/auth/login` with the seeded credentials.
-3. Copy the JWT token from the response.
-4. Click the `Authorize` button in Swagger.
-5. Paste `<token>`.
-6. Call protected project and task endpoints directly from the UI.
+2. Call available project and task endpoints directly from the UI.
 
 This removes the need for Postman during review.
 
